@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { GameState } from '../types';
+import { GameState } from '../types.ts';
 
 interface HUDProps {
   gameState: GameState;
@@ -10,7 +10,7 @@ interface HUDProps {
 const HUD: React.FC<HUDProps> = ({ gameState, onStart }) => {
   return (
     <div className="flex flex-col gap-6 w-full max-w-[300px] text-white">
-      <div className="space-y-1">
+      <div className="space-y-1 text-center md:text-left">
         <h1 className="text-4xl font-orbitron font-bold tracking-tighter italic text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500">
           NEON SPACE
         </h1>

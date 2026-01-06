@@ -1,18 +1,26 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
-import PinballEngine from './components/PinballEngine';
-import HUD from './components/HUD';
-import OnScreenControls from './components/OnScreenControls';
-import { GameState } from './types';
+import React, { useState, useCallback } from 'react';
+import PinballEngine from './components/PinballEngine.tsx';
+import HUD from './components/HUD.tsx';
+import OnScreenControls from './components/OnScreenControls.tsx';
+import { GameState } from './types.ts';
 
 const App: React.FC = () => {
+  const getHighScore = () => {
+    try {
+      return parseInt(localStorage.getItem('highScore') || '0', 10);
+    } catch (e) {
+      return 0;
+    }
+  };
+
   const [gameState, setGameState] = useState<GameState>({
     score: 0,
     balls: 3,
     multiplier: 1,
     isGameOver: false,
     isPlaying: false,
-    highScore: parseInt(localStorage.getItem('highScore') || '0', 10)
+    highScore: getHighScore()
   });
 
   const startGame = () => {
@@ -29,7 +37,9 @@ const App: React.FC = () => {
   const handleGameOver = useCallback((finalScore: number) => {
     setGameState(prev => {
       const newHighScore = Math.max(prev.highScore, finalScore);
-      localStorage.setItem('highScore', newHighScore.toString());
+      try {
+        localStorage.setItem('highScore', newHighScore.toString());
+      } catch (e) {}
       return {
         ...prev,
         isPlaying: false,
@@ -78,7 +88,7 @@ const App: React.FC = () => {
         ))}
       </div>
 
-      <main className="relative z-10 flex flex-col md:flex-row items-center gap-8">
+      <main className="relative z-10 flex flex-col md:flex-row items-center gap-8 px-4">
         <HUD gameState={gameState} onStart={startGame} />
         
         <div className="relative group">
@@ -97,26 +107,24 @@ const App: React.FC = () => {
           <div className="p-4 border border-white/10 rounded-xl bg-white/5 backdrop-blur-md">
             <h3 className="font-orbitron text-xs font-bold text-blue-400 mb-2 uppercase tracking-widest">Controls</h3>
             <ul className="text-sm space-y-2">
-              <li className="flex justify-between"><span>Left Flipper</span> <kbd className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-xs">Z</kbd></li>
-              <li className="flex justify-between"><span>Right Flipper</span> <kbd className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-xs">M</kbd></li>
-              <li className="flex justify-between"><span>Launch Ball</span> <kbd className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-xs">SPACE</kbd></li>
+              <li className="flex justify-between gap-4"><span>Left Flipper</span> <kbd className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-xs whitespace-nowrap">Z Key</kbd></li>
+              <li className="flex justify-between gap-4"><span>Right Flipper</span> <kbd className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-xs whitespace-nowrap">M Key</kbd></li>
+              <li className="flex justify-between gap-4"><span>Launch Ball</span> <kbd className="px-2 py-0.5 rounded bg-white/10 text-white font-mono text-xs whitespace-nowrap">SPACE</kbd></li>
             </ul>
           </div>
           <div className="p-4 border border-white/10 rounded-xl bg-white/5 backdrop-blur-md">
             <h3 className="font-orbitron text-xs font-bold text-pink-400 mb-2 uppercase tracking-widest">Missions</h3>
             <ul className="text-xs space-y-2 italic">
-              <li>• Hit the 3 pink bumpers for 300 pts!</li>
-              <li>• Navigate the upper loop for 1000 pts!</li>
-              <li>• Don't let the ball fall into the void.</li>
+              <li>• Hit pink bumpers for 100 pts</li>
+              <li>• Hit yellow targets for 500 pts</li>
+              <li>• Don't let the ball escape!</li>
             </ul>
           </div>
         </div>
       </main>
 
-      {/* Visual Controls in the bottom-left */}
       <OnScreenControls />
 
-      {/* Footer Info */}
       <footer className="absolute bottom-4 text-white/20 text-[10px] uppercase tracking-tighter">
         Modernized Space Cadet Tribute &bull; Built with React & Matter.js
       </footer>
